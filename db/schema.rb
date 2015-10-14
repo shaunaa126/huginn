@@ -178,10 +178,8 @@ ActiveRecord::Schema.define(version: 20150808115436) do
     t.string   "username",               limit: 191,                 null: false, charset: "utf8mb4", collation: "utf8mb4_unicode_ci"
     t.string   "invitation_code",        limit: 255,                                                  collation: "utf8_bin"
     t.integer  "scenario_count",         limit: 4,   default: 0,     null: false
-    t.string   "authentication_token",   limit: 191
   end
 
-  add_index "users", ["authentication_token"], name: "index_users_on_authentication_token", unique: true, using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
