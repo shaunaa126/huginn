@@ -170,6 +170,35 @@ describe Agents::WebsiteAgent do
     end
 
     describe 'unzipping' do
+      it 'should unzip automatically if the response has Content-Encoding: gzip' do
+        json = {
+          'response' => {
+            'version' => 2,
+            'title' => "hello!"
+          }
+        }
+        zipped = ActiveSupport::Gzip.compress(json.to_json)
+        stub_request(:any, /gzip/).to_return(body: zipped, headers: { 'Content-Encoding' => 'gzip' }, status: 200)
+        site = {
+          'name' => "Some JSON Response",
+          'expected_update_period_in_days' => "2",
+          'type' => "json",
+          'url' => "http://gzip.com",
+          'mode' => 'on_change',
+          'extract' => {
+            'version' => { 'path' => 'response.version' },
+          },
+          # no unzip option
+        }
+        checker = Agents::WebsiteAgent.new(:name => "Weather Site", :options => site)
+        checker.user = users(:bob)
+        checker.save!
+
+        checker.check
+        event = Event.last
+        expect(event.payload['version']).to eq(2)
+      end
+
       it 'should unzip with unzip option' do
         json = {
           'response' => {
@@ -178,7 +207,7 @@ describe Agents::WebsiteAgent do
           }
         }
         zipped = ActiveSupport::Gzip.compress(json.to_json)
-        stub_request(:any, /gzip/).to_return(:body => zipped, :status => 200)
+        stub_request(:any, /gzip/).to_return(body: zipped, status: 200)
         site = {
           'name' => "Some JSON Response",
           'expected_update_period_in_days' => "2",
@@ -197,6 +226,36 @@ describe Agents::WebsiteAgent do
         checker.check
         event = Event.last
         expect(event.payload['version']).to eq(2)
+      end
+
+      it 'should either avoid or support a raw deflate stream (#1018)' do
+        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /\A(?!.*deflate)/ }).
+          to_return(body: 'hello',
+                    status: 200)
+        stub_request(:any, /deflate/).with(headers: { 'Accept-Encoding' => /deflate/ }).
+          to_return(body: '\xcb\x48\xcd\xc9\xc9\x07\x00\x06\x2c'.force_encoding(Encoding::ASCII_8BIT),
+                    headers: { 'Content-Encoding' => 'deflate' },
+                    status: 200)
+
+        site = {
+          'name' => 'Some Response',
+          'expected_update_period_in_days' => '2',
+          'type' => 'text',
+          'url' => 'http://deflate',
+          'mode' => 'on_change',
+          'extract' => {
+            'content' => { 'regexp' => '.+', 'index' => 0 }
+          }
+        }
+        checker = Agents::WebsiteAgent.new(name: "Deflate Test", options: site)
+        checker.user = users(:bob)
+        checker.save!
+
+        expect {
+          checker.check
+        }.to change { Event.count }.by(1)
+        event = Event.last
+        expect(event.payload['content']).to eq('hello')
       end
     end
 
@@ -642,6 +701,19 @@ fire: hot
         @checker.receive([@event])
 
         expect(stub).to have_been_requested
+      end
+
+      it "should allow url_from_event to be an array of urls" do
+        stub1 = stub_request(:any, 'http://example.org/?url=http%3A%2F%2Fxkcd.com')
+        stub2 = stub_request(:any, 'http://google.org/?url=http%3A%2F%2Fxkcd.com')
+
+        @checker.options = @valid_options.merge(
+          'url_from_event' => ['http://example.org/?url={{url | uri_escape}}', 'http://google.org/?url={{url | uri_escape}}']
+        )
+        @checker.receive([@event])
+
+        expect(stub1).to have_been_requested
+        expect(stub2).to have_been_requested
       end
 
       it "should interpolate values from incoming event payload" do

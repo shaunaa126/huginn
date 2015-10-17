@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
+# Ruby 2.0 is the minimum requirement
+ruby ['2.0.0', RUBY_VERSION].max
+
 # Optional libraries.  To conserve RAM, comment out any that you don't need,
 # then run `bundle` and commit the updated Gemfile and Gemfile.lock.
 gem 'twilio-ruby', '~> 3.11.5'    # TwilioAgent
@@ -26,7 +29,7 @@ gem 'twitter-stream', github: 'cantino/twitter-stream', branch: 'huginn'
 gem 'omniauth-twitter'
 
 # Tumblr Agents
-gem 'tumblr_client'
+gem 'tumblr_client', github: 'knu/tumblr_client', branch: 'patch-1'
 gem 'omniauth-tumblr'
 
 # Dropbox Agents
@@ -36,9 +39,12 @@ gem 'omniauth-dropbox'
 # UserLocationAgent
 gem 'haversine'
 
+# EvernoteAgent
+gem 'omniauth-evernote'
+gem 'evernote_oauth'
+
 # Optional Services.
 gem 'omniauth-37signals'          # BasecampAgent
-# gem 'omniauth-github'
 gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
 
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
@@ -56,12 +62,12 @@ gem 'bundler', '>= 1.5.0'
 gem 'coffee-rails', '~> 4.1.0'
 gem 'daemons', '~> 1.1.9'
 gem 'delayed_job', '~> 4.0.0'
-gem 'delayed_job_active_record', '~> 4.0.0'
+gem 'delayed_job_active_record', :git => 'https://github.com/cantino/delayed_job_active_record', :branch => 'configurable-reserve-sql-strategy'
 gem 'devise', '~> 3.4.0'
 gem 'dotenv-rails', '~> 2.0.1'
 gem 'em-http-request', '~> 1.1.2'
 gem 'faraday', '~> 0.9.0'
-gem 'faraday_middleware'
+gem 'faraday_middleware', '>= 0.10.0'
 gem 'feed-normalizer'
 gem 'font-awesome-sass', '~> 4.3.2'
 gem 'foreman', '~> 0.63.0'
@@ -81,7 +87,7 @@ gem 'mysql2', '~> 0.3.16'
 gem 'multi_xml'
 gem 'nokogiri', '~> 1.6.4'
 gem 'omniauth'
-gem 'rails' , '4.2.2'
+gem 'rails', '4.2.4'
 gem 'rufus-scheduler', '~> 3.0.8', require: false
 gem 'sass-rails',   '~> 5.0.3'
 gem 'select2-rails', '~> 3.5.4'
@@ -96,8 +102,13 @@ group :development do
   gem 'binding_of_caller'
   gem 'quiet_assets'
   gem 'guard'
-  gem 'guard-livereload'
+  gem 'guard-livereload', '~> 2.2'
   gem 'guard-rspec'
+  gem 'letter_opener_web'
+
+  gem 'capistrano', '~> 3.4.0'
+  gem 'capistrano-rails', '~> 1.1'
+  gem 'capistrano-bundler', '~> 1.1.4'
 
   group :test do
     gem 'coveralls', require: false
@@ -109,8 +120,6 @@ group :development do
     gem 'rspec-rails', '~> 3.1'
     gem 'rspec-html-matchers', '~> 0.7'
     gem 'shoulda-matchers'
-    gem 'spring', '~> 1.3.0'
-    gem 'spring-commands-rspec'
     gem 'vcr'
     gem 'webmock', '~> 1.17.4', require: false
   end
@@ -118,6 +127,7 @@ end
 
 group :production do
   gem 'rack', '> 1.5.0'
+  gem 'unicorn', '~> 4.9.0'
 end
 
 # Platform requirements.
@@ -143,6 +153,5 @@ end
 
 on_heroku do
   gem 'pg'
-  gem 'unicorn'
   gem 'rails_12factor', group: :production
 end
