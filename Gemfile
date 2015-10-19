@@ -47,6 +47,12 @@ gem 'evernote_oauth'
 gem 'omniauth-37signals'          # BasecampAgent
 gem 'omniauth-wunderlist', github: 'wunderlist/omniauth-wunderlist', ref: 'd0910d0396107b9302aa1bc50e74bb140990ccb8'
 
+# API Services
+gem 'grape'
+gem 'grape-swagger-rails'
+gem 'rack-cors', :require => 'rack/cors'
+gem 'grape-active_model_serializers'
+
 # Bundler <1.5 does not recognize :x64_mingw as a valid platform name.
 # Unfortunately, it can't self-update because it errors when encountering :x64_mingw.
 unless Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.5.0')

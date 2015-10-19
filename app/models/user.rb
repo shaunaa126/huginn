@@ -10,11 +10,13 @@ class User < ActiveRecord::Base
   # This is in addition to a real persisted field like 'username'
   attr_accessor :login
 
-  ACCESSIBLE_ATTRIBUTES = [ :email, :username, :login, :password, :password_confirmation, :remember_me, :invitation_code ]
+  ACCESSIBLE_ATTRIBUTES = [ :email, :username, :login, :password, :password_confirmation, :remember_me, :invitation_code, :authentication_token ]
 
   attr_accessible *ACCESSIBLE_ATTRIBUTES
   attr_accessible *(ACCESSIBLE_ATTRIBUTES + [:admin]), :as => :admin
 
+  before_save :ensure_authentication_token
+    
   validates_presence_of :username
   validates_uniqueness_of :username
   validates_format_of :username, :with => /\A[a-zA-Z0-9_-]{3,15}\Z/, :message => "can only contain letters, numbers, underscores, and dashes, and must be between 3 and 15 characters in length."
@@ -44,4 +46,18 @@ class User < ActiveRecord::Base
   def self.using_invitation_code?
     ENV['SKIP_INVITATION_CODE'] != 'true'
   end
+  
+  def ensure_authentication_token
+    self.authentication_token ||= generate_authentication_token
+  end
+  
+  private
+  
+  def generate_authentication_token
+    loop do
+      token = Devise.friendly_token
+      break token unless User.where(authentication_token: token).first
+    end
+  end
+
 end
