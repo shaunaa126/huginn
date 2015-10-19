@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150808115436) do
+ActiveRecord::Schema.define(version: 20151019055822) do
 
   create_table "agent_logs", force: :cascade do |t|
     t.integer  "agent_id",          limit: 4,                 null: false
@@ -26,9 +26,9 @@ ActiveRecord::Schema.define(version: 20150808115436) do
   create_table "agents", force: :cascade do |t|
     t.integer  "user_id",               limit: 4
     t.text     "options",               limit: 65535,                                   charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.string   "type",                  limit: 255,                                                         collation: "utf8_bin"
-    t.string   "name",                  limit: 255,                                     charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.string   "schedule",              limit: 255,                                                         collation: "utf8_bin"
+    t.string   "type",                  limit: 191,                                                         collation: "utf8_bin"
+    t.string   "name",                  limit: 191,                                     charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.string   "schedule",              limit: 191,                                                         collation: "utf8_bin"
     t.integer  "events_count",          limit: 4,          default: 0,     null: false
     t.datetime "last_check_at"
     t.datetime "last_receive_at"
@@ -40,10 +40,10 @@ ActiveRecord::Schema.define(version: 20150808115436) do
     t.integer  "keep_events_for",       limit: 4,          default: 0,     null: false
     t.datetime "last_event_at"
     t.datetime "last_error_log_at"
-    t.boolean  "propagate_immediately", limit: 1,          default: false, null: false
-    t.boolean  "disabled",              limit: 1,          default: false, null: false
-    t.string   "guid",                  limit: 255,                        null: false, charset: "ascii",   collation: "ascii_bin"
+    t.boolean  "propagate_immediately",                    default: false, null: false
+    t.boolean  "disabled",                                 default: false, null: false
     t.integer  "service_id",            limit: 4
+    t.string   "guid",                  limit: 191,                        null: false
   end
 
   add_index "agents", ["guid"], name: "index_agents_on_guid", using: :btree
@@ -69,8 +69,8 @@ ActiveRecord::Schema.define(version: 20150808115436) do
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
-    t.string   "locked_by",  limit: 255
-    t.string   "queue",      limit: 255
+    t.string   "locked_by",  limit: 191
+    t.string   "queue",      limit: 191
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -114,33 +114,33 @@ ActiveRecord::Schema.define(version: 20150808115436) do
   add_index "scenario_memberships", ["scenario_id"], name: "index_scenario_memberships_on_scenario_id", using: :btree
 
   create_table "scenarios", force: :cascade do |t|
-    t.string   "name",         limit: 255,                   null: false, charset: "utf8mb4", collation: "utf8mb4_bin"
+    t.string   "name",         limit: 191,                   null: false, charset: "utf8mb4", collation: "utf8mb4_bin"
     t.integer  "user_id",      limit: 4,                     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "description",  limit: 65535,                              charset: "utf8mb4", collation: "utf8mb4_bin"
-    t.boolean  "public",       limit: 1,     default: false, null: false
-    t.string   "guid",         limit: 255,                   null: false, charset: "ascii",   collation: "ascii_bin"
-    t.string   "source_url",   limit: 255
-    t.string   "tag_bg_color", limit: 255
-    t.string   "tag_fg_color", limit: 255
+    t.boolean  "public",                     default: false, null: false
+    t.string   "guid",         limit: 191,                   null: false, charset: "ascii",   collation: "ascii_bin"
+    t.string   "source_url",   limit: 191
+    t.string   "tag_bg_color", limit: 191
+    t.string   "tag_fg_color", limit: 191
   end
 
   add_index "scenarios", ["user_id", "guid"], name: "index_scenarios_on_user_id_and_guid", unique: true, using: :btree
 
   create_table "services", force: :cascade do |t|
     t.integer  "user_id",       limit: 4,                     null: false
-    t.string   "provider",      limit: 255,                   null: false, collation: "utf8_general_ci"
-    t.string   "name",          limit: 255,                   null: false, collation: "utf8_general_ci"
-    t.text     "token",         limit: 65535,                 null: false, collation: "utf8_general_ci"
-    t.text     "secret",        limit: 65535,                              collation: "utf8_general_ci"
-    t.text     "refresh_token", limit: 65535,                              collation: "utf8_general_ci"
+    t.string   "provider",      limit: 191,                   null: false
+    t.string   "name",          limit: 191,                   null: false
+    t.text     "token",         limit: 65535,                 null: false
+    t.text     "secret",        limit: 65535
+    t.text     "refresh_token", limit: 65535
     t.datetime "expires_at"
-    t.boolean  "global",        limit: 1,     default: false
-    t.text     "options",       limit: 65535,                              collation: "utf8_general_ci"
+    t.boolean  "global",                      default: false
+    t.text     "options",       limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uid",           limit: 255,                                collation: "utf8_general_ci"
+    t.string   "uid",           limit: 191
   end
 
   add_index "services", ["provider"], name: "index_services_on_provider", using: :btree
@@ -149,37 +149,39 @@ ActiveRecord::Schema.define(version: 20150808115436) do
 
   create_table "user_credentials", force: :cascade do |t|
     t.integer  "user_id",          limit: 4,                      null: false
-    t.string   "credential_name",  limit: 255,                    null: false
+    t.string   "credential_name",  limit: 191,                    null: false
     t.text     "credential_value", limit: 65535,                  null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "mode",             limit: 255,   default: "text", null: false, collation: "utf8_bin"
+    t.string   "mode",             limit: 191,   default: "text", null: false, collation: "utf8_bin"
   end
 
   add_index "user_credentials", ["user_id", "credential_name"], name: "index_user_credentials_on_user_id_and_credential_name", unique: true, using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  limit: 255, default: "",    null: false,                     collation: "utf8_bin"
-    t.string   "encrypted_password",     limit: 255, default: "",    null: false, charset: "ascii",   collation: "ascii_bin"
-    t.string   "reset_password_token",   limit: 255,                                                  collation: "utf8_bin"
+    t.string   "email",                  limit: 191, default: "",    null: false,                     collation: "utf8_bin"
+    t.string   "encrypted_password",     limit: 191, default: "",    null: false, charset: "ascii",   collation: "ascii_bin"
+    t.string   "reset_password_token",   limit: 191,                                                  collation: "utf8_bin"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
     t.integer  "sign_in_count",          limit: 4,   default: 0
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip",     limit: 255
-    t.string   "last_sign_in_ip",        limit: 255
+    t.string   "current_sign_in_ip",     limit: 191
+    t.string   "last_sign_in_ip",        limit: 191
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "admin",                  limit: 1,   default: false, null: false
+    t.boolean  "admin",                              default: false, null: false
     t.integer  "failed_attempts",        limit: 4,   default: 0
-    t.string   "unlock_token",           limit: 255
+    t.string   "unlock_token",           limit: 191
     t.datetime "locked_at"
-    t.string   "username",               limit: 191,                 null: false, charset: "utf8mb4", collation: "utf8mb4_unicode_ci"
-    t.string   "invitation_code",        limit: 255,                                                  collation: "utf8_bin"
+    t.string   "username",               limit: 191,                              charset: "utf8mb4", collation: "utf8mb4_unicode_ci"
+    t.string   "invitation_code",        limit: 191
     t.integer  "scenario_count",         limit: 4,   default: 0,     null: false
+    t.string   "authentication_token",   limit: 191
   end
 
+  add_index "users", ["authentication_token"], name: "index_users_on_authentication_token", unique: true, using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
