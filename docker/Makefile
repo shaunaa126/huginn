@@ -1,2 +1,2 @@
 build:
-	docker build -t cantino/huginn .
+	docker build -t shaunaa126/huginn .
