@@ -12,32 +12,32 @@ module API
              Grape::Formatter::ActiveModelSerializers
         rescue_from :all, backtrace: true
 	
-	before do
-      		error!("401 Unauthorized", 401) unless authenticated
-    	end
+	      before do
+             error!("401 Unauthorized", 401) unless authenticated
+    	  end
 
         helpers do
-          def permitted_params
-            @permitted_params ||= declared(params, 
-               include_missing: false)
-          end
-
-          def logger
-            Rails.logger
-          end
-	
-	  def warden
-            env['warden']
-          end
-
-          def authenticated
-            return true if warden.authenticated?
-            params[:api_key] && @user = User.find_by_authentication_token(params[:api_key])
-	  end
-	
-	  def current_user
-            warden.user || @user
-	  end
+            def permitted_params
+              @permitted_params ||= declared(params, 
+                 include_missing: false)
+            end
+  
+            def logger
+              Rails.logger
+            end
+  	
+  	        def warden
+              env['warden']
+            end
+  
+            def authenticated
+              return true if warden.authenticated?
+              params[:api_key] && @user = User.find_by_authentication_token(params[:api_key])
+  	        end
+  	
+  	        def current_user
+              warden.user || @user
+  	        end
         end
 
         rescue_from ActiveRecord::RecordNotFound do |e|

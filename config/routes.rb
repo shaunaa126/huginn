@@ -83,7 +83,7 @@ Huginn::Application.routes.draw do
   get "/about" => "home#about"
   root :to => "home#index"
   
-  mount API::Base, at: "/api"
+  mount API::Base, at: "/"
   mount GrapeSwaggerRails::Engine, at: "/documentation"
 
 end
