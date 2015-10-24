@@ -8,6 +8,11 @@ module API
 				get do
 					current_user.as_json	
 				end
+
+				desc "Get all users"
+				get "users" do
+					User.all
+				end
 			end
 		end
 	end
